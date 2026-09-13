@@ -1,9 +1,9 @@
 const areas = [
   "3D Architecture",
   "AI Visualization",
-  "Cinematic Content",
-  "Real Estate Marketing",
-  "Technology",
+  "Material Studies",
+  "Photorealistic Renders",
+  "Real-estate Visualization",
 ];
 export default function About() {
   return (
@@ -18,7 +18,7 @@ export default function About() {
           margin: "32px 0 100px",
         }}
       >
-        Architecture, told in its <i>next dimension.</i>
+        Architecture, seen through <i>new material and light.</i>
       </h1>
       <section
         style={{
@@ -38,14 +38,12 @@ export default function About() {
               marginTop: 0,
             }}
           >
-            ARCHIVIA explores how architectural 3D, generative AI and cinematic
-            content can work together to communicate architectural ideas.
+            ARCHIVIA explores how architectural 3D, material studies and AI
+            visualization can communicate architectural ideas.
           </p>
           <p style={{ color: "var(--muted)", lineHeight: 1.7, maxWidth: 530 }}>
-            A creative technology study shaped around composition, material,
-            lighting and market-ready visual storytelling. Built with Next.js,
-            React, TypeScript, Three.js, React Three Fiber, Blender and
-            AI-assisted workflows.
+            A visual practice shaped around composition, material, lighting and
+            market-ready architectural storytelling.
           </p>
         </div>
       </section>

@@ -1,74 +1,27 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { ClientArchitectureViewer } from "@/components/3d/ClientArchitectureViewer";
-import { projects } from "@/data/projects";
-import { ProjectCard } from "@/components/ui/ProjectCard";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+
+const process = [
+  ["01", "3D Architecture", "A spatial framework with real proportion, light and point of view."],
+  ["02", "Material Study", "Surface, texture and reflection are resolved as part of the architecture."],
+  ["03", "AI Visualization", "A controlled visual layer extends the design intent without losing it."],
+  ["04", "Photorealistic Render", "A calm, considered image ready for an architectural narrative."],
+];
+
 export default function Home() {
-  return (
-    <main className="page">
-      <section className="home-hero">
-        <div className="hero-canvas">
-          <ClientArchitectureViewer />
-        </div>
-        <div className="wrap hero-copy">
-          <div className="reveal">
-            <p className="eyebrow">ARCHIVIA · VISUALIZATION STUDIO</p>
-            <h1 className="display">ARCHIVIA</h1>
-            <p className="hero-title">
-              Interactive architecture
-              <br />& AI visualization
-            </p>
-          </div>
-          <div className="hero-bottom">
-            <p>
-              Exploring the intersection of architectural 3D, AI-generated
-              visualization and cinematic real-estate content.
-            </p>
-            <div>
-              <Link className="button inverse" href="/projects/villa-aurelia">
-                Explore Villa Aurelia <ArrowUpRight size={15} />
-              </Link>
-              <Link className="button inverse" href="/projects">
-                View projects
-              </Link>
-            </div>
-            <p className="eyebrow hero-info">
-              Interactive 3D
-              <br />
-              Villa Aurelia
-              <br />
-              Modern Classic Residence
-            </p>
-          </div>
-        </div>
-      </section>
-      <section className="wrap section">
-        <SectionHeading
-          label="Selected works"
-          title="Architecture made tangible."
-        />
-        <div className="home-grid">
-          {projects.slice(0, 2).map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} />
-          ))}
-        </div>
-      </section>
-      <section className="case-dark">
-        <div className="wrap">
-          <p className="eyebrow">The collection</p>
-          <h2 className="display section-title">
-            Spaces for
-            <br />
-            <i>slow looking.</i>
-          </h2>
-          <p style={{ maxWidth: 420, color: "#c5c5bd", lineHeight: 1.7 }}>
-            Architecture, AI visualization and cinematic content designed to
-            articulate spatial ideas with clarity.
-          </p>
-        </div>
-      </section>
-      <style>{`.home-hero{height:100svh;min-height:680px;background:#171716;position:relative;color:white;overflow:hidden}.hero-canvas{position:absolute;inset:0;opacity:.95}.hero-copy{height:100%;position:relative;z-index:1;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding-top:130px;padding-bottom:35px}.hero-copy h1{font-size:clamp(64px,11vw,160px);line-height:.82;margin:22px 0 24px}.hero-title{font-size:clamp(18px,2vw,26px);margin:0}.hero-bottom{display:grid;grid-template-columns:1fr 1.2fr auto;gap:30px;align-items:end}.hero-bottom>p{max-width:370px;font-size:13px;line-height:1.6}.hero-bottom div{display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto}.hero-info{line-height:1.7;margin:0}.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6vw 28px}@media(max-width:700px){.hero-bottom{grid-template-columns:1fr;gap:16px}.hero-info{display:none}.home-grid{grid-template-columns:1fr}}`}</style>
-    </main>
-  );
+  return <main className="studio-page">
+    <section className="studio-hero">
+      <div className="hero-model"><ClientArchitectureViewer showMaterials materialSet="homepage" /></div>
+      <div className="hero-overlay">
+        <div className="hero-title-block"><p className="eyebrow">ARCHIVIA</p><h1>3D Architecture<br /><i>AI Visualization</i></h1></div>
+        <div className="hero-foot"><p className="eyebrow">Villa Aurelia / 01<br />Interactive architectural study</p><a href="#material-studies" className="scroll-cue"><span>Scroll to explore</span><ArrowDownRight size={16} /></a></div>
+      </div>
+    </section>
+    <section id="material-studies" className="material-intro wrap editorial-rule"><p className="eyebrow">01 / Material Studies</p><div><h2>One architecture.<br /><i>Multiple material expressions.</i></h2><p>The villa above is a live material study. Each palette modifies the same GLB surfaces—walls, stone, concrete, wood, metal, glass and paving—while its geometry remains intact.</p></div></section>
+    <section className="ai-feature wrap"><aside><span className="feature-no">02</span><p className="eyebrow">AI Visualization</p></aside><div className="ai-visual"><div className="ai-caption eyebrow">Villa Aurelia / Exterior atmosphere</div></div><div className="ai-copy"><h2>Image-making with<br /><i>architectural discipline.</i></h2><p>ARCHIVIA combines built geometry with AI-assisted visual direction to study daylight, material mood and photographic composition before a final render is resolved.</p></div></section>
+    <section id="process" className="process-section"><div className="wrap"><p className="eyebrow">03 / From model to image</p><div className="process-lead">A deliberate sequence<br />of <i>visual decisions.</i></div></div><div className="process-list wrap">{process.map(([number, title, description]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
+    <section className="render-section wrap"><div className="render-heading"><p className="eyebrow">04 / Photorealistic renders</p><h2>Composed for<br /><i>slow looking.</i></h2></div><div className="render-editorial"><figure className="render-frame render-one"><figcaption>Exterior / 01</figcaption></figure><figure className="render-frame render-two"><figcaption>Interior / 02</figcaption></figure><figure className="render-frame render-three"><figcaption>Material / 03</figcaption></figure><figure className="render-frame render-four"><figcaption>Detail / 04</figcaption></figure></div></section>
+    <section className="about-statement wrap editorial-rule"><p className="eyebrow">ARCHIVIA / About</p><h2>A visual exploration of architecture through <i>3D environments, material studies and AI visualization.</i></h2></section>
+    <section className="contact-cta"><div className="wrap"><p className="eyebrow">Contact / Selected collaborations</p><h2>Let&apos;s visualize<br /><i>the next space.</i></h2><a href="mailto:studio@archivia.design">Studio@archivia.design <ArrowUpRight size={18} /></a></div></section>
+  </main>;
 }

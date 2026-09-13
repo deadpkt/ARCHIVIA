@@ -2,43 +2,40 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
-  PerspectiveCamera,
   ContactShadows,
 } from "@react-three/drei";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { memo, Suspense, useEffect, useRef, useState } from "react";
+import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Maximize2, RotateCcw, Sun, Moon } from "lucide-react";
-import { MaterialMood, ProceduralVilla } from "./ProceduralVilla";
-type Preset = "exterior" | "living" | "kitchen" | "pool";
-const positions: Record<Preset, [number, number, number]> = {
-  exterior: [10, 6, 11],
-  living: [4, 2.8, 7],
-  kitchen: [-1.5, 3.1, 6.8],
-  pool: [-10, 4.4, 9],
-};
-function Scene({
-  night,
-  variant,
-  mood,
-  preset,
-  reset,
-}: {
-  night: boolean;
-  variant: string;
-  mood: MaterialMood;
-  preset: Preset;
-  reset: number;
-}) {
+import { VillaAureliaModel } from "./VillaAureliaModel";
+import type { MaterialMood } from "./VillaAureliaModel";
+const INITIAL_CAMERA_POSITION = new Vector3(10, 6, 11);
+const INITIAL_ORBIT_TARGET = new Vector3(0, 1.7, 0);
+const CANVAS_CAMERA = { position: [10, 6, 11] as [number, number, number], fov: 42 };
+
+const ViewerRig = memo(function ViewerRig({ reset }: { reset: number }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(...positions[preset]);
-    controls.current?.target.set(0, 1.7, 0);
+    camera.position.copy(INITIAL_CAMERA_POSITION);
+    controls.current?.target.copy(INITIAL_ORBIT_TARGET);
     controls.current?.update();
-  }, [camera, preset, reset]);
+  }, [camera, reset]);
+  return (
+    <OrbitControls
+      ref={controls}
+      makeDefault
+      minDistance={7}
+      maxDistance={18}
+      maxPolarAngle={Math.PI / 2.05}
+    />
+  );
+});
+
+function Scene({ night, mood, reset }: { night: boolean; mood: MaterialMood; reset: number }) {
   return (
     <>
-      <PerspectiveCamera makeDefault position={positions.exterior} fov={42} />
       <ambientLight intensity={night ? 0.32 : 1.4} />
       <directionalLight
         castShadow
@@ -54,73 +51,75 @@ function Scene({
           distance={7}
         />
       )}
-      <ProceduralVilla night={night} variant={variant} materialMood={mood} />
+      <VillaAureliaModel night={night} mood={mood} />
       <ContactShadows
-        position={[0, -0.37, 0]}
+        position={[0, -0.04, 0]}
         opacity={0.35}
         scale={20}
         blur={2.5}
       />
-      <OrbitControls
-        ref={controls}
-        makeDefault
-        target={[0, 1.7, 0]}
-        minDistance={7}
-        maxDistance={18}
-        maxPolarAngle={Math.PI / 2.05}
-      />
+      <ViewerRig reset={reset} />
     </>
   );
 }
-const moods: { id: MaterialMood; label: string }[] = [
+type MaterialOption = { id: MaterialMood; label: string; swatch?: string };
+const projectMoods: MaterialOption[] = [
   { id: "warm", label: "Warm stone" },
   { id: "contemporary", label: "Contemporary" },
   { id: "earthen", label: "Earthen" },
 ];
+const homepageMoods: MaterialOption[] = [
+  { id: "naturalStone", label: "Natural Stone", swatch: "#aaa18f" },
+  { id: "warmLimestone", label: "Warm Limestone", swatch: "#d5c2a2" },
+  { id: "concrete", label: "Concrete", swatch: "#90938f" },
+  { id: "darkStone", label: "Dark Stone", swatch: "#4b4a45" },
+  { id: "woodStone", label: "Wood + Stone", swatch: "#8a613d" },
+];
 export function ArchitectureViewer({
   variant = "villa",
   showMaterials = false,
+  materialSet = "project",
 }: {
   variant?: string;
   showMaterials?: boolean;
+  materialSet?: "project" | "homepage";
 }) {
   const [night, setNight] = useState(false);
-  const [preset, setPreset] = useState<Preset>("exterior");
-  const [mood, setMood] = useState<MaterialMood>("warm");
+  const [mood, setMood] = useState<MaterialMood>(
+    materialSet === "homepage" ? "naturalStone" : "warm",
+  );
   const [reset, setReset] = useState(0);
   const root = useRef<HTMLDivElement>(null);
+  const materialMoods = materialSet === "homepage" ? homepageMoods : projectMoods;
   return (
     <div ref={root} className="viewer">
-      <Canvas shadows dpr={[1, 1.7]} gl={{ antialias: true }}>
+      <Canvas shadows dpr={[1, 1.7]} gl={{ antialias: true }} camera={CANVAS_CAMERA}>
         <Suspense fallback={null}>
           <Scene
             night={night}
-            variant={variant}
             mood={mood}
-            preset={preset}
             reset={reset}
           />
         </Suspense>
       </Canvas>
-      <div className="preset-controls">
-        {(["exterior", "living", "kitchen", "pool"] as Preset[]).map((item) => (
-          <button
-            onClick={() => setPreset(item)}
-            className={preset === item ? "active" : ""}
-            key={item}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
       {showMaterials && (
         <div className="materials">
-          {moods.map((item) => (
+          {materialSet === "homepage" && (
+            <div className="material-heading">
+              <span className="eyebrow">Material study</span>
+              <strong>Villa Aurelia</strong>
+            </div>
+          )}
+          {materialMoods.map((item) => (
             <button
               key={item.id}
               onClick={() => setMood(item.id)}
               className={mood === item.id ? "active" : ""}
+              aria-pressed={mood === item.id}
             >
+              {item.swatch && (
+                <i className="swatch" style={{ background: item.swatch }} />
+              )}
               {item.label}
             </button>
           ))}
@@ -129,20 +128,19 @@ export function ArchitectureViewer({
       <div className="controls">
         <button onClick={() => setNight(!night)}>
           {night ? <Sun size={15} /> : <Moon size={15} />}
-          <span>{night ? "Day" : "Night"}</span>
+          <span className="control-label">{night ? "Day" : "Night"}</span>
         </button>
         <button
           onClick={() => {
-            setPreset("exterior");
             setReset((x) => x + 1);
           }}
         >
           <RotateCcw size={15} />
-          <span>Reset</span>
+          <span className="control-label">Reset</span>
         </button>
         <button onClick={() => root.current?.requestFullscreen()}>
           <Maximize2 size={15} />
-          <span>Fullscreen</span>
+          <span className="control-label">Fullscreen</span>
         </button>
       </div>
       <div className="hint eyebrow">Drag to rotate · Scroll to zoom</div>
@@ -155,7 +153,6 @@ export function ArchitectureViewer({
           background: #c7d3d0;
         }
         .controls,
-        .preset-controls,
         .materials {
           position: absolute;
           display: flex;
@@ -165,21 +162,34 @@ export function ArchitectureViewer({
           bottom: 18px;
           left: 18px;
         }
-        .preset-controls {
-          top: 18px;
-          left: 18px;
-        }
         .materials {
-          top: 18px;
-          right: 18px;
+          top: 96px;
+          right: 4.5vw;
+          width: 208px;
+          padding: 16px;
+          flex-direction: column;
+          gap: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          background: rgba(24, 26, 23, 0.68);
+          backdrop-filter: blur(12px);
+        }
+        .material-heading {
+          display: grid;
+          gap: 5px;
+          padding: 0 3px 12px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.19);
+          margin-bottom: 5px;
+        }
+        .material-heading strong {
+          color: #f1ece2;
+          font: 500 20px/1 "Playfair Display", serif;
         }
         .controls button,
-        .preset-controls button,
         .materials button {
           border: 1px solid rgba(255, 255, 255, 0.42);
           background: rgba(20, 24, 21, 0.72);
           color: #fff;
-          padding: 10px 12px;
+          padding: 9px 10px;
           display: flex;
           gap: 7px;
           align-items: center;
@@ -187,12 +197,15 @@ export function ArchitectureViewer({
           letter-spacing: 0.1em;
           text-transform: uppercase;
           cursor: pointer;
+          transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
-        .preset-controls .active,
         .materials .active {
-          background: #e9e2d5;
+          background: rgba(235, 229, 217, 0.92);
           color: #1b1b19;
         }
+        .materials button:hover { border-color: rgba(255, 255, 255, 0.85); }
+        .swatch { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,.45); flex: 0 0 auto; }
+        .materials .active .swatch { border-color: rgba(23,23,22,.4); }
         .hint {
           position: absolute;
           right: 18px;
@@ -204,22 +217,17 @@ export function ArchitectureViewer({
           .viewer {
             min-height: 430px;
           }
-          .controls button span {
+          .control-label {
             display: none;
           }
           .hint {
             display: none;
           }
-          .preset-controls {
-            max-width: calc(100% - 36px);
-            flex-wrap: wrap;
-          }
           .materials {
-            top: 64px;
-            right: 18px;
-            max-width: 180px;
-            flex-wrap: wrap;
-            justify-content: end;
+            top: 72px;
+            right: 14px;
+            width: 190px;
+            padding: 12px;
           }
         }
       `}</style>

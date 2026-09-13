@@ -8,6 +8,7 @@ const ArchitectureViewer = dynamic(
 export function ClientArchitectureViewer(props: {
   variant?: string;
   showMaterials?: boolean;
+  materialSet?: "project" | "homepage";
 }) {
   return <ArchitectureViewer {...props} />;
 }
