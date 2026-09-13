@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Footer } from "@/components/ui/Footer";
 import { Navbar } from "@/components/ui/Navbar";
 export const metadata: Metadata = {
   title: "ARCHIVIA — Interactive Architecture & AI Visualization",
@@ -14,6 +15,7 @@ export default function RootLayout({
       <body>
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

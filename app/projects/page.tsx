@@ -1,27 +1,26 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { projects } from "@/data/projects";
-import { ProjectCard } from "@/components/ui/ProjectCard";
+
 export default function Projects() {
   return (
-    <main className="wrap" style={{ paddingTop: 160, paddingBottom: 110 }}>
-      <p className="eyebrow">The collection · 04 projects</p>
-      <h1
-        className="display"
-        style={{
-          fontSize: "clamp(56px,10vw,132px)",
-          lineHeight: 0.85,
-          margin: "30px 0 88px",
-        }}
-      >
-        Selected
-        <br />
-        <i>architecture.</i>
-      </h1>
-      <div className="grid">
-        {projects.map((p, i) => (
-          <ProjectCard key={p.id} project={p} index={i} />
+    <main className="project-index">
+      <header className="wrap project-index-head">
+        <p className="eyebrow">Index / Selected studies</p>
+        <h1>Projects<br /><i>in atmosphere.</i></h1>
+        <p>A collection of architectural visualizations shaped through proportion, material and light.</p>
+      </header>
+      <section className="project-index-list">
+        {projects.map((project, index) => (
+          <Link href={`/projects/${project.id}`} className={`index-project project-${index}`} key={project.id}>
+            <span className="index-number">0{index + 1}</span>
+            <h2>{project.title}</h2>
+            <span className="index-category">{project.category}</span>
+            <div className="index-preview" aria-hidden="true"><span className="eyebrow">{project.location}</span></div>
+            <ArrowUpRight className="index-arrow" size={20} />
+          </Link>
         ))}
-      </div>
-      <style>{`.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7vw 28px}@media(max-width:700px){.grid{grid-template-columns:1fr}}`}</style>
+      </section>
     </main>
   );
 }
